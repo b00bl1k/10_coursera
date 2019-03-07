@@ -1,6 +1,12 @@
 # Coursera Dump
 
-[TODO. There will be project description]
+The script parse data from 20 random courses from coursera.org and save to the xls-file.
+
+# Usage
+
+```bash
+$ python coursera.py output.xls 
+```
 
 # Project Goals
 
