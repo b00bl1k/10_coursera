@@ -6,6 +6,8 @@ from bs4 import BeautifulSoup
 from openpyxl import Workbook
 import requests
 
+COURSES_MAX = 20
+
 
 def fetch_page(url):
     try:
@@ -103,12 +105,12 @@ def main():
         sys.exit("Usage: python coursera.py <output>")
     else:
         filepath = sys.argv[1]
-    courses_urls = get_courses_list(20)
+    courses_urls = get_courses_list(COURSES_MAX)
     courses_info = []
     for course_url in courses_urls:
         course_page = fetch_page(course_url)
-        info = get_course_info(course_page)
-        courses_info.append(info)
+        course_info = get_course_info(course_page)
+        courses_info.append(course_info)
         output_courses_info_to_xlsx(courses_info, filepath)
 
 
