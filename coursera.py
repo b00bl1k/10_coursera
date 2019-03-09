@@ -20,12 +20,12 @@ def get_ld_by_type(ld, datatype):
     return list(filter(lambda course: course["@type"] == datatype, ld))[0]
 
 
-def get_courses_list(max_size=20):
+def get_random_courses_list(max_size=20):
     courses_url = "https://www.coursera.org/sitemap~www~courses.xml"
     page_text = fetch_page(courses_url)
     if page_text:
         xml_doc = BeautifulSoup(page_text, "xml")
-        urls = [url.loc.text for url in xml_doc.find_all('url')]
+        urls = [url.loc.text for url in xml_doc.find_all("url")]
         random.shuffle(urls)
         return urls[:max_size]
 
@@ -54,7 +54,7 @@ def get_product_avg_rating(linked_data):
 
 
 def get_course_info(page_content):
-    page = BeautifulSoup(page_content, 'html.parser')
+    page = BeautifulSoup(page_content, "html.parser")
     script_tag = page.find("script", type="application/ld+json")
     linked_data = json.loads(script_tag.contents[0])
     course_linked_data = get_ld_by_type(linked_data["@graph"], "Course")
@@ -79,9 +79,7 @@ def get_course_info(page_content):
     }
 
 
-def output_courses_info_to_xlsx(courses, filepath):
-    workbook = Workbook()
-    worksheet = workbook.active
+def output_courses_info_to_xlsx(worksheet, courses):
     worksheet.append([
         "Title",
         "Language",
@@ -97,7 +95,6 @@ def output_courses_info_to_xlsx(courses, filepath):
             course["weeks"],
             course["avg_rating"]
         ])
-    workbook.save(filepath)
 
 
 def main():
@@ -105,13 +102,16 @@ def main():
         sys.exit("Usage: python coursera.py <output>")
     else:
         filepath = sys.argv[1]
-    courses_urls = get_courses_list(COURSES_MAX)
+    courses_urls = get_random_courses_list(COURSES_MAX)
     courses_info = []
     for course_url in courses_urls:
         course_page = fetch_page(course_url)
         course_info = get_course_info(course_page)
         courses_info.append(course_info)
-        output_courses_info_to_xlsx(courses_info, filepath)
+
+    workbook = Workbook()
+    output_courses_info_to_xlsx(workbook.active, courses_info)
+    workbook.save(filepath)
 
 
 if __name__ == "__main__":
